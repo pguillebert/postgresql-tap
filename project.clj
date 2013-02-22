@@ -1,4 +1,4 @@
-(defproject postgreql-tap "1.0.0"
+(defproject postgresql-tap "1.0.0"
   :description "Postgresql Tap for cascading"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [cascalog "1.10.0"]
