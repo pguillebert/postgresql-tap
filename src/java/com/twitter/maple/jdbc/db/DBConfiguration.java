@@ -31,7 +31,7 @@ package com.twitter.maple.jdbc.db;
 
 import org.apache.hadoop.conf.Configuration;
 
-import cascading.tuple.Tuple;
+import cascading.tuple.TupleEntry;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -227,8 +227,8 @@ public class DBConfiguration {
             .getClass(DBConfiguration.INPUT_CLASS_PROPERTY, DBInputFormat.NullDBWritable.class);
     }
 
-    void setInputClass(Class<? extends Tuple> inputClass) {
-        job.setClass(DBConfiguration.INPUT_CLASS_PROPERTY, inputClass, Tuple.class);
+    void setInputClass(Class<? extends TupleEntry> inputClass) {
+        job.setClass(DBConfiguration.INPUT_CLASS_PROPERTY, inputClass, TupleEntry.class);
     }
 
     String getOutputTableName() {

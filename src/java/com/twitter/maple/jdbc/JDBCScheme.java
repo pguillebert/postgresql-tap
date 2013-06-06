@@ -514,11 +514,11 @@ public class JDBCScheme extends Scheme<JobConf, RecordReader, OutputCollector, O
         int concurrentReads = ( (JDBCTap) tap ).concurrentReads;
 
         if( selectQuery != null )
-            DBInputFormat.setInput( conf, Tuple.class, selectQuery, countQuery, limit, concurrentReads );
+            DBInputFormat.setInput( conf, TupleEntry.class, selectQuery, countQuery, limit, concurrentReads );
         else {
             String tableName = ( (JDBCTap) tap ).getTableName();
             String joinedOrderBy = orderBy != null ? Util.join( orderBy, ", " ) : null;
-            DBInputFormat.setInput( conf, Tuple.class, tableName, conditions, joinedOrderBy, limit, concurrentReads, columns );
+            DBInputFormat.setInput( conf, TupleEntry.class, tableName, conditions, joinedOrderBy, limit, concurrentReads, columns );
         }
 
         if( inputFormatClass != null )
@@ -557,9 +557,8 @@ public class JDBCScheme extends Scheme<JobConf, RecordReader, OutputCollector, O
         if( !result )
             return false;
 
-        Tuple newTuple = (Tuple) value;
-        sourceCall.getIncomingEntry().setTuple( newTuple );
-
+        TupleEntry te = (TupleEntry) value;
+        sourceCall.getIncomingEntry().setTuple(te.getTuple());
         return true;
     }
 

@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cascading.tuple.Tuple;
+import cascading.tuple.TupleEntry;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +49,7 @@ import java.sql.*;
  * containing the record number as key and DBWritables as value. <p/> The SQL query, and input class
  * can be using one of the two setInput methods.
  */
-public class DBInputFormat<T extends Tuple>
+public class DBInputFormat<T extends TupleEntry>
     implements InputFormat<LongWritable, T>, JobConfigurable {
     /** Field LOG */
     private static final Logger LOG = LoggerFactory.getLogger(DBInputFormat.class);
@@ -176,8 +177,17 @@ public class DBInputFormat<T extends Tuple>
                 // Set the key field value as the output key value
                 key.set(pos + split.getStart());
 
-                for( int i = 0; i < results.getMetaData().getColumnCount(); i++ )
-                    value.add( (Comparable) results.getObject( i + 1 ) );
+                Tuple out = new Tuple();
+
+                for( int i = 0; i < results.getMetaData().getColumnCount(); i++ ) {
+                    String colname = results.getMetaData().getColumnName(i + 1);
+                    // Fields f = new Fields("?" + colname);
+                    Tuple t = new Tuple( (Comparable) results.getObject( i + 1 ));
+                    // TupleEntry n = new TupleEntry(f, t);
+                    out = out.append(t);
+                }
+
+                value.setTuple(out);
 
                 pos++;
             } catch (SQLException exception) {
@@ -405,7 +415,7 @@ public class DBInputFormat<T extends Tuple>
      * @param fieldNames      The field names in the table
      * @param concurrentReads
      */
-    public static void setInput(JobConf job, Class<? extends Tuple> inputClass,
+    public static void setInput(JobConf job, Class<? extends TupleEntry> inputClass,
         String tableName, String conditions, String orderBy, long limit, int concurrentReads,
         String... fieldNames) {
         job.setInputFormat(DBInputFormat.class);
@@ -436,7 +446,7 @@ public class DBInputFormat<T extends Tuple>
      *                        Example : "SELECT COUNT(f1) FROM Mytable"
      * @param concurrentReads
      */
-    public static void setInput(JobConf job, Class<? extends Tuple> inputClass,
+    public static void setInput(JobConf job, Class<? extends TupleEntry> inputClass,
         String selectQuery, String countQuery, long limit, int concurrentReads) {
         job.setInputFormat(DBInputFormat.class);
 
